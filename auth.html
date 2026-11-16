@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in — Fraktion</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/fraktion.css">
+  <style>
+    .auth { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+    .auth-side { background: var(--ink); color: #fff; padding: 40px 56px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+    .auth-side .logo { color: #fff; }
+    .auth-side h2 { font-size: clamp(40px, 4.4vw, 64px); margin-top: 40px; }
+    .auth-side h2 em { color: var(--yellow); font-style: normal; }
+    .auth-list { display: grid; gap: 16px; margin: 36px 0; max-width: 420px; }
+    .auth-list div { display: flex; gap: 14px; align-items: flex-start; color: #CFCBBF; }
+    .auth-list .row-icon { background: var(--ink-3); color: var(--yellow); flex-shrink: 0; }
+    .auth-list b { color: #fff; display: block; }
+    .stack { position: absolute; right: -40px; bottom: 60px; display: grid; gap: 10px; transform: rotate(-6deg); opacity: .9; }
+    .stack i { display: block; width: 220px; height: 54px; border-radius: 8px; background: var(--ink-3); border-top: 10px solid var(--yellow); }
+    .auth-main { display: grid; place-items: center; padding: 40px 24px; }
+    .auth-card { width: min(420px, 100%); }
+    .auth-card h1 { font-size: 32px; font-stretch: 115%; font-weight: 800; }
+    .auth-card .sub { color: var(--muted); margin: 8px 0 26px; }
+    .switch { margin-top: 22px; font-size: 15px; color: var(--muted); text-align: center; }
+    .switch button, .link-btn { background: none; border: 0; padding: 0; color: var(--text); font-weight: 650; text-decoration: underline; cursor: pointer; }
+    .err { display: none; margin-top: 14px; padding: 10px 12px; border-radius: var(--r); background: var(--red-soft); color: var(--red); font-size: 14px; }
+    .err.show { display: block; }
+    .notice { padding: 18px; border-radius: var(--r-lg); background: var(--yellow-soft); border: 1px solid var(--yellow); }
+    .plan-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .mobile-logo { display: none; margin-bottom: 30px; }
+    @media (max-width: 880px) {
+      .auth { grid-template-columns: 1fr; }
+      .auth-side { display: none; }
+      .mobile-logo { display: inline-flex; }
+    }
+  </style>
+</head>
+<body>
+<div id="demo-banner"></div>
+<div class="auth">
+  <aside class="auth-side">
+    <a class="logo" href="index.html"><span class="logo-mark" data-icon="logo"></span>Fraktion</a>
+    <div>
+      <h2 class="display">Storage from your <em>doorstep.</em></h2>
+      <div class="auth-list">
+        <div><span class="row-icon" data-icon="box"></span><span><b>We drop off empty bins</b>Fill them at your own pace.</span></div>
+        <div><span class="row-icon" data-icon="tag"></span><span><b>Label every bin</b>Know exactly what's where.</span></div>
+        <div><span class="row-icon" data-icon="truck"></span><span><b>Tap to get it back</b>Delivered in the window you choose.</span></div>
+      </div>
+    </div>
+    <span class="hint" style="color:#8F8B80">Oakville · Burlington · Mississauga</span>
+    <div class="stack" aria-hidden="true"><i></i><i></i><i></i></div>
+  </aside>
+
+  <main class="auth-main">
+    <div class="auth-card" id="card"></div>
+  </main>
+</div>
+<script type="module" src="assets/js/auth.js"></script>
+</body>
+</html>

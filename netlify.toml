@@ -1,0 +1,36 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Clean URLs: /app, /login, /admin
+[[redirects]]
+  from = "/login"
+  to = "/auth.html"
+  status = 200
+[[redirects]]
+  from = "/signup"
+  to = "/auth.html?mode=signup"
+  status = 302
+[[redirects]]
+  from = "/app"
+  to = "/app.html"
+  status = 200
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

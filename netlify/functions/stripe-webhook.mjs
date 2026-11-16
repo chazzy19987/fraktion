@@ -1,7 +1,7 @@
 // Keeps Supabase in sync with Stripe: plan + subscription status, and paid rental bookings.
 // In Stripe → Developers → Webhooks, point an endpoint at /.netlify/functions/stripe-webhook and send:
 //   checkout.session.completed, customer.subscription.created, customer.subscription.updated, customer.subscription.deleted
-import { json, db, verifyStripeSignature, PLAN_CREDITS, planForPrice } from '../lib/shared.mjs';
+import { json, db, verifyStripeSignature, FREE_DELIVERIES } from '../lib/shared.mjs';
 
 const STATUS = { active: 'active', trialing: 'active', past_due: 'past_due', unpaid: 'past_due', incomplete: 'none', incomplete_expired: 'canceled', canceled: 'canceled', paused: 'past_due' };
 
@@ -19,20 +19,19 @@ export default async (req) => {
     }
 
     if (event.type.startsWith('customer.subscription.')) {
-      const plan = obj.metadata?.plan || planForPrice(obj.items?.data?.[0]?.price?.id);
       let userId = obj.metadata?.user_id;
       if (!userId) {
         const [p] = await db(`profiles?stripe_customer_id=eq.${obj.customer}&select=id`);
         userId = p?.id;
       }
       if (userId) {
-        const [current] = await db(`profiles?id=eq.${userId}&select=plan,subscription_status`);
+        const [current] = await db(`profiles?id=eq.${userId}&select=subscription_status`);
         const status = event.type === 'customer.subscription.deleted' ? 'canceled' : (STATUS[obj.status] || 'none');
         const patch = { subscription_status: status };
-        // New plan (or first activation): set it and refresh the year's delivery credits.
-        if (plan && status === 'active' && (plan !== current?.plan || current?.subscription_status !== 'active')) {
+        // First activation: put them on the standard plan with this year's free deliveries.
+        if (status === 'active' && current?.subscription_status !== 'active') {
           const reset = new Date(); reset.setFullYear(reset.getFullYear() + 1);
-          Object.assign(patch, { plan, delivery_credits: PLAN_CREDITS[plan], credits_reset_on: reset.toISOString().slice(0, 10) });
+          Object.assign(patch, { plan: 'standard', delivery_credits: FREE_DELIVERIES, credits_reset_on: reset.toISOString().slice(0, 10) });
         }
         await db(`profiles?id=eq.${userId}`, { method: 'PATCH', body: patch });
       }

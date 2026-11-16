@@ -19,8 +19,8 @@ create table if not exists public.profiles (
   city text,
   postal_code text,
   access_notes text,                          -- buzzer, side door, dog in yard…
-  plan text not null default 'starter' check (plan in ('starter','family','pro')),
-  delivery_credits integer default 4,         -- null = unlimited (Pro)
+  plan text not null default 'standard' check (plan in ('standard','starter','family','pro')),
+  delivery_credits integer default 10,        -- free deliveries left this year; null = unlimited
   credits_reset_on date default (current_date + interval '1 year'),
   subscription_status text default 'none',    -- none | active | past_due | canceled (set by Stripe webhook)
   stripe_customer_id text,
@@ -119,6 +119,12 @@ create table if not exists public.waitlist (
   created_at timestamptz not null default now()
 );
 
+-- Upgrade from the earlier three-tier plans (safe to re-run)
+alter table public.profiles alter column plan set default 'standard';
+alter table public.profiles alter column delivery_credits set default 10;
+alter table public.profiles drop constraint if exists profiles_plan_check;
+alter table public.profiles add constraint profiles_plan_check check (plan in ('standard','starter','family','pro'));
+
 -- =====================================================================
 -- Helpers
 -- =====================================================================
@@ -214,6 +220,13 @@ begin
     if bad_count > 0 then raise exception 'One or more bins are not available for this request'; end if;
   elsif new.type = 'new_bins' then
     if new.quantity < 1 or new.quantity > 20 then raise exception 'Choose between 1 and 20 bins'; end if;
+    -- Accounts start at 3 bins (owned + already on the way + this request)
+    if (select count(*) from public.bins where owner_id = new.customer_id and kind = 'bin')
+       + coalesce((select sum(quantity) from public.requests where customer_id = new.customer_id and type = 'new_bins'
+                   and status in ('requested','scheduled','en_route')), 0)
+       + new.quantity < 3 then
+      raise exception 'Accounts start at 3 bins';
+    end if;
   end if;
 
   if new.address is null then

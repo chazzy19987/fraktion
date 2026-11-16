@@ -65,7 +65,17 @@ export function verifyStripeSignature(rawBody, header, secret, toleranceSec = 30
   return sigs.some((s) => s.length === expected.length && crypto.timingSafeEqual(Buffer.from(s), Buffer.from(expected)));
 }
 
-export const PLAN_CREDITS = { starter: 4, family: 10, pro: null };
-export const priceFor = (plan) => ({ starter: env('STRIPE_PRICE_STARTER'), family: env('STRIPE_PRICE_FAMILY'), pro: env('STRIPE_PRICE_PRO') }[plan]);
-export const planForPrice = (priceId) => Object.keys(PLAN_CREDITS).find((p) => priceFor(p) === priceId);
+export const FREE_DELIVERIES = 10;     // per year, every account
+export const MIN_BINS = 3;
+export const binPrice = () => env('STRIPE_PRICE_BIN');            // $5/month, per unit
+export const oversizedPrice = () => env('STRIPE_PRICE_OVERSIZED'); // optional, $7/month per unit
+
+/** What a customer should be billed for right now, from their bins. */
+export async function billableCounts(userId) {
+  const bins = await db(`bins?owner_id=eq.${userId}&select=kind`);
+  return {
+    bins: Math.max(MIN_BINS, bins.filter((b) => b.kind === 'bin').length),
+    oversized: bins.filter((b) => b.kind === 'oversized').length,
+  };
+}
 export const siteUrl = (req) => env('URL') || new URL(req.url).origin;

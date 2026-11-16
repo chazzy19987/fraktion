@@ -2,8 +2,8 @@
 import {
   icon, esc, money, fmtDate, fmtRelative, isoDate, serviceDays, toast, modal, confirmModal, setBusy,
   dateStrip, windowChoices, WINDOWS, BIN_STATUS, REQ_STATUS, REQ_TYPE, EMOJIS,
-} from './ui.js?v=4';
-import * as api from './api.js?v=4';
+} from './ui.js?v=5';
+import * as api from './api.js?v=5';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -47,7 +47,10 @@ async function refresh() { await loadAll(); render(); }
 
 /* --------------------------------------------------------------- helpers */
 const route = () => (location.hash.slice(1) || 'bins').split('?')[0];
-const plan = () => api.PLANS[state.profile.plan] || api.PLANS.starter;
+const plan = () => api.PLANS[state.profile.plan] || api.PLANS.standard;
+const PR = api.PRICING;
+const binCount = () => state.bins.filter((b) => b.kind === 'bin').length;
+const monthlyCents = () => Math.max(binCount(), PR.minBins) * PR.binCents + state.bins.filter((b) => b.kind === 'oversized').length * api.OVERSIZED_CENTS;
 const firstName = () => (state.profile.full_name || '').split(' ')[0] || 'there';
 const binById = (id) => state.bins.find((b) => b.id === id);
 const openRequests = () => state.requests.filter((r) => OPEN.includes(r.status));
@@ -89,10 +92,10 @@ function shell(title, sub, actions, body) {
         ${state.profile.is_admin ? `<a href="admin.html">${icon.warehouse}Ops board</a>` : ''}
       </nav>
       <div class="plan-card">
-        <span class="eyebrow">Your plan</span>
-        <h4>${p.name}</h4>
+        <span class="eyebrow">${Math.max(binCount(), PR.minBins)} bins · ${PR.name}</span>
+        <h4>${money(monthlyCents())}<small style="font-size:13px;color:var(--muted-light);font-weight:500"> / month</small></h4>
         ${total === null ? `<div class="meter"><i style="width:100%"></i></div><small>Unlimited deliveries</small>`
-          : `<div class="meter"><i style="width:${Math.max(0, Math.min(100, (left / total) * 100))}%"></i></div><small>${left} of ${total} delivery credits left this year</small>`}
+          : `<div class="meter"><i style="width:${Math.max(0, Math.min(100, (left / total) * 100))}%"></i></div><small>${left} of ${total} free deliveries left this year</small>`}
         <a href="#account" class="btn btn-ghost-dark btn-sm btn-block" style="margin-top:14px">Manage plan</a>
       </div>
     </aside>
@@ -185,7 +188,7 @@ function viewBins() {
   body += `<div class="stats">
     <div class="card stat"><div class="stat-num">${stored}</div><div class="stat-label">In storage</div></div>
     <div class="card stat"><div class="stat-num">${home}</div><div class="stat-label">With you</div></div>
-    <div class="card stat"><div class="stat-num">${creditsLabel()}</div><div class="stat-label">Delivery credits left</div></div>
+    <div class="card stat"><div class="stat-num">${creditsLabel()}</div><div class="stat-label">Free deliveries left</div></div>
     <div class="card stat"><div class="stat-num" style="font-size:20px;padding-top:8px">${nextReq ? fmtDate(nextReq.scheduled_date) : '—'}</div><div class="stat-label">${nextReq ? `Next visit · ${WINDOWS[nextReq.time_window].time}` : 'No visits booked'}</div></div>
   </div>`;
 
@@ -221,7 +224,7 @@ function viewBins() {
     body += `<div class="bin-grid">${visible.map(binCard).join('')}</div>`;
   }
 
-  root.innerHTML = shell(`Hi, ${esc(firstName())}`, `${bins.length} bin${bins.length === 1 ? '' : 's'} · ${plan().name} plan`, actions, body);
+  root.innerHTML = shell(`Hi, ${esc(firstName())}`, `${bins.length} bin${bins.length === 1 ? '' : 's'} · ${money(monthlyCents())}/month`, actions, body);
 
   $('#bin-search')?.addEventListener('input', (e) => {
     state.search = e.target.value;
@@ -335,9 +338,9 @@ function requestModal(type, preselected) {
   const p = state.profile;
   const creditLine = () => {
     if (!isDelivery) return 'Pickups are always free.';
-    if (p.delivery_credits === null) return 'Included in your Pro plan.';
-    if (p.delivery_credits > 0) return `Uses 1 of your ${p.delivery_credits} remaining delivery credits.`;
-    return `You're out of credits — this delivery is ${money(api.EXTRA_DELIVERY_CENTS)}.`;
+    if (p.delivery_credits === null) return 'Included in your plan.';
+    if (p.delivery_credits > 0) return `Free — ${p.delivery_credits} of ${PR.deliveriesPerYear} free deliveries left this year.`;
+    return `You've used this year's ${PR.deliveriesPerYear} free deliveries — this one is ${money(api.EXTRA_DELIVERY_CENTS)}.`;
   };
   modal({
     title: isDelivery ? 'Bring bins to me' : 'Send bins to storage',
@@ -377,30 +380,31 @@ function requestModal(type, preselected) {
 /* -------------------------------------------------------- add more bins */
 function addBinsModal() {
   if (!hasAddress()) { toast('Add your address first so we know where to drop them off.'); location.hash = 'account'; return; }
-  const p = plan();
-  const owned = state.bins.filter((b) => b.kind === 'bin').length;
-  let qty = state.bins.length ? 2 : (p.bins || 4);
+  const owned = binCount();
+  const coming = openRequests().filter((r) => r.type === 'new_bins').reduce((n, r) => n + r.quantity, 0);
+  const minQty = Math.max(1, PR.minBins - owned - coming);
+  let qty = owned + coming ? 2 : PR.standardBins;
+  qty = Math.max(qty, minQty);
   const priceLine = () => {
-    if (!p.bins) return `+ <b>${money(qty * p.price * 100)}</b>/month on Starter ($5 per bin)`;
-    const extra = Math.max(0, owned + qty - p.bins);
-    return extra ? `${p.bins - Math.min(owned, p.bins)} included in ${p.name} · <b>${extra} extra</b> at $5/bin/month` : `Included in your ${p.name} plan (${owned + qty} of ${p.bins} bins)`;
+    const total = Math.max(owned + coming + qty, PR.minBins);
+    return `<span>${qty} × ${money(PR.binCents)}/month</span><span>Bins total: <b>${money(total * PR.binCents)}/month</b> for ${total}</span>`;
   };
   modal({
     title: 'Get empty bins',
     subtitle: 'We drop them off, you fill them, then book a pickup.',
     body: `
       <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
-        <div><span class="label">How many bins?</span><p class="hint">102 L each, with snap-on lids.</p></div>
+        <div><span class="label">How many bins?</span><p class="hint">102 L each, with snap-on lids. ${owned + coming ? '' : `Most homes start with ${PR.standardBins}; the minimum is ${PR.minBins}.`}</p></div>
         <div class="stepper"><button type="button" id="q-minus" aria-label="Fewer">−</button><output id="q-val">${qty}</output><button type="button" id="q-plus" aria-label="More">+</button></div>
       </div>
       <div class="field" style="margin-top:18px"><span class="label">Drop-off day</span>${dateStrip('date', serviceDays(10))}</div>
       <div class="field"><span class="label">Time window</span>${windowChoices('window', 'morning')}</div>
       <div class="field"><label class="label" for="nb-notes">Notes <span class="hint">(optional)</span></label><input class="input" id="nb-notes" name="notes" maxlength="200" placeholder="e.g. Leave on the porch"></div>
-      <div class="modal-summary"><span id="q-price"></span></div>`,
+      <div class="modal-summary" id="q-price" style="flex-wrap:wrap"></div>`,
     actions: `<button type="button" class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" type="submit">${icon.box}Book drop-off</button>`,
     onMount: (m) => {
       const paint = () => { $('#q-val', m.el).textContent = qty; $('#q-price', m.el).innerHTML = priceLine(); };
-      $('#q-minus', m.el).onclick = () => { qty = Math.max(1, qty - 1); paint(); };
+      $('#q-minus', m.el).onclick = () => { qty = Math.max(minQty, qty - 1); paint(); };
       $('#q-plus', m.el).onclick = () => { qty = Math.min(20, qty + 1); paint(); };
       paint();
       m.onSubmit = async (e) => {
@@ -412,12 +416,8 @@ function addBinsModal() {
           m.close();
           toast(`<b>${qty} bins on the way</b> — ${fmtDate(r.scheduled_date, { weekday: 'long', month: 'short', day: 'numeric' })}, ${WINDOWS[r.time_window].time}.`);
           await refresh();
-          // Brand-new customer who picked a plan at sign-up: take them to payment next.
-          const chosen = sessionStorage.getItem('fraktion-plan');
-          if (chosen && api.billingEnabled() && state.profile.subscription_status !== 'active') {
-            sessionStorage.removeItem('fraktion-plan');
-            planModal(chosen);
-          }
+          // Brand-new customer: start billing (with the founding-member free months) right after their first drop-off.
+          if (api.billingEnabled() && state.profile.subscription_status !== 'active') planModal();
         } catch (err) { setBusy(btn, false); toast(esc(err.message)); }
       };
     },
@@ -550,8 +550,8 @@ function rentalModal(it) {
 
 /* ========================================================= ACCOUNT VIEW */
 function viewAccount() {
-  const p = state.profile, pl = plan();
-  const subLabel = { active: 'Active', past_due: 'Payment due', canceled: 'Cancelled', none: 'Not started' }[p.subscription_status] || p.subscription_status;
+  const p = state.profile;
+  const subLabel = { active: 'Active', past_due: 'Payment due', canceled: 'Cancelled', none: 'Not billing yet' }[p.subscription_status] || p.subscription_status;
   const body = `<div class="acct-grid">
     <form class="card card-pad" id="acct-form" novalidate>
       <h2 style="font-size:18px;margin-bottom:4px">Delivery details</h2>
@@ -572,15 +572,15 @@ function viewAccount() {
 
     <div style="display:grid;gap:18px">
       <div class="card card-pad">
-        <div class="plan-now"><div><span class="eyebrow">Your plan</span><h3 style="margin-top:6px">${pl.name}</h3><div class="hint">${pl.priceLabel} ${pl.unit}</div></div><span class="pill ${p.subscription_status === 'active' ? 'pill-done' : 'pill-pending'}">${subLabel}</span></div>
+        <div class="plan-now"><div><span class="eyebrow">Your plan</span><h3 style="margin-top:6px">${money(monthlyCents())}<span style="font-size:15px;font-weight:500;color:var(--muted)"> / month</span></h3><div class="hint">${PR.name} · ${money(PR.binCents)} per bin${binCount() < PR.minBins ? ` · ${PR.minBins}-bin minimum` : ''}</div></div><span class="pill ${p.subscription_status === 'active' ? 'pill-done' : 'pill-pending'}">${subLabel}</span></div>
         <dl class="kv">
-          <dt>Bins</dt><dd>${state.bins.filter((b) => b.kind === 'bin').length}${pl.bins ? ` of ${pl.bins} included` : ''}</dd>
-          <dt>Oversized items</dt><dd>${state.bins.filter((b) => b.kind === 'oversized').length}</dd>
-          <dt>Delivery credits</dt><dd>${p.delivery_credits === null ? 'Unlimited' : `${p.delivery_credits} left this year`}</dd>
+          <dt>Bins</dt><dd>${binCount()} × ${money(PR.binCents)}</dd>
+          <dt>Oversized items</dt><dd>${state.bins.filter((b) => b.kind === 'oversized').length} × ${money(api.OVERSIZED_CENTS)}</dd>
+          <dt>Free deliveries</dt><dd>${p.delivery_credits === null ? 'Unlimited' : `${p.delivery_credits} of ${PR.deliveriesPerYear} left this year`}</dd>
           <dt>Member since</dt><dd>${fmtDate(p.created_at, { month: 'long', year: 'numeric' })}</dd>
         </dl>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
-          <button class="btn btn-primary btn-sm" data-act="change-plan">${p.subscription_status === 'active' ? 'Change plan' : 'Start plan'}</button>
+          <button class="btn btn-primary btn-sm" data-act="change-plan">${p.subscription_status === 'active' ? 'Update billing' : 'Start billing'}</button>
           <button class="btn btn-ghost btn-sm" data-act="billing">${icon.card}Billing & invoices</button>
         </div>
       </div>
@@ -611,23 +611,29 @@ function viewAccount() {
   });
 }
 
-function planModal(preferred) {
-  const cur = preferred || state.profile.plan;
+function planModal() {
+  if (state.profile.subscription_status === 'active') { api.openBillingPortal().catch((err) => toast(esc(err.message))); return; }
+  const bins = Math.max(binCount(), PR.minBins);
   modal({
-    title: 'Choose your plan',
-    subtitle: 'Founding members get their first month free.',
-    body: `<div class="choices" style="grid-template-columns:1fr">${Object.entries(api.PLANS).map(([k, p]) => `
-      <label class="choice"><input type="radio" name="plan" value="${k}" ${k === cur ? 'checked' : ''}>
-      <span style="grid-template-columns:1fr auto;align-items:center;padding:14px 16px"><span><b style="font-size:16px">${p.name}</b><small style="display:block">${p.blurb} ${p.credits === null ? 'Unlimited deliveries.' : `${p.credits} delivery credits a year.`}</small></span><b style="font-size:18px">${p.priceLabel}<small style="display:block;text-align:right">${p.unit}</small></b></span></label>`).join('')}</div>
-      ${api.billingEnabled() ? '' : '<p class="hint" style="margin-top:14px">Card payments go live once Stripe is connected. Until then, we\'ll invoice founding members directly.</p>'}`,
-    actions: `<button type="button" class="btn btn-ghost" data-close>Not now</button><button class="btn btn-primary" type="submit">Continue to payment</button>`,
+    title: 'Start billing',
+    subtitle: `Founding members pay nothing for the first ${PR.founderFreeMonths} months.`,
+    body: `<div class="card card-pad" style="background:var(--paper)">
+        <dl class="kv" style="margin-top:0">
+          <dt>Bins</dt><dd>${bins} × ${money(PR.binCents)}/month</dd>
+          <dt>Free deliveries</dt><dd>${PR.deliveriesPerYear} a year, then ${money(api.EXTRA_DELIVERY_CENTS)} each</dd>
+          <dt>Pickups</dt><dd>Always free</dd>
+          <dt>First ${PR.founderFreeMonths} months</dt><dd style="color:var(--green)">$0</dd>
+          <dt>After that</dt><dd>${money(monthlyCents())}/month</dd>
+        </dl>
+      </div>
+      <p class="hint" style="margin-top:12px">Your bill follows your bin count — add bins and it goes up, send them home for good and it goes down. Cancel any time.</p>
+      ${api.billingEnabled() ? '' : '<p class="hint" style="margin-top:10px">Card payments go live once Stripe is connected. Until then, we\'ll invoice founding members directly.</p>'}`,
+    actions: `<button type="button" class="btn btn-ghost" data-close>Not now</button><button class="btn btn-primary" type="submit">Add a card</button>`,
     onMount: (m) => {
       m.onSubmit = async (e) => {
-        const chosen = new FormData(m.form).get('plan');
         const btn = e.submitter || $('button[type="submit"]', m.el);
         setBusy(btn, true, 'Opening checkout…');
-        const qty = chosen === 'starter' ? Math.max(1, state.bins.filter((b) => b.kind === 'bin').length || 4) : 1;
-        try { await api.startPlanCheckout(chosen, qty); } catch (err) { setBusy(btn, false); m.close(); toast(esc(err.message)); }
+        try { await api.startPlanCheckout(); } catch (err) { setBusy(btn, false); m.close(); toast(esc(err.message)); }
       };
     },
   });

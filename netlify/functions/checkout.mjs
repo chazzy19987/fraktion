@@ -1,5 +1,5 @@
 // Starts Stripe Checkout for a plan subscription or a rental booking.
-import { json, userFromRequest, db, stripe, priceFor, siteUrl } from '../lib/shared.mjs';
+import { json, userFromRequest, db, stripe, binPrice, oversizedPrice, billableCounts, siteUrl } from '../lib/shared.mjs';
 
 async function ensureCustomer(profile) {
   if (profile.stripe_customer_id) return profile.stripe_customer_id;
@@ -25,14 +25,16 @@ export default async (req) => {
 
   try {
     if (body.kind === 'plan') {
-      const price = priceFor(body.plan);
-      if (!price) return json(400, { error: 'Unknown plan' });
+      if (!binPrice()) return json(400, { error: 'Billing is not set up yet' });
+      // Bill for the bins they have (or the 3-bin minimum); founding members get free months first.
+      const counts = await billableCounts(user.id);
       const trial = parseInt(process.env.STRIPE_FOUNDING_TRIAL_DAYS || '0', 10);
+      const line_items = [{ price: binPrice(), quantity: counts.bins }];
+      if (counts.oversized && oversizedPrice()) line_items.push({ price: oversizedPrice(), quantity: counts.oversized });
       const session = await stripe('checkout/sessions', {
-        mode: 'subscription', customer,
-        line_items: [{ price, quantity: body.plan === 'starter' ? Math.min(Math.max(parseInt(body.quantity, 10) || 1, 1), 100) : 1 }],
-        subscription_data: { metadata: { user_id: user.id, plan: body.plan }, ...(trial > 0 && profile.subscription_status === 'none' ? { trial_period_days: trial } : {}) },
-        metadata: { kind: 'plan', user_id: user.id, plan: body.plan },
+        mode: 'subscription', customer, line_items,
+        subscription_data: { metadata: { user_id: user.id, plan: 'standard' }, ...(trial > 0 && profile.subscription_status === 'none' ? { trial_period_days: trial } : {}) },
+        metadata: { kind: 'plan', user_id: user.id, plan: 'standard' },
         allow_promotion_codes: 'true',
         success_url: `${base}/app.html?checkout=success#account`,
         cancel_url: `${base}/app.html#account`,

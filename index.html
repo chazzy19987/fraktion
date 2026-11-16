@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/fraktion.css?v=4">
+  <link rel="stylesheet" href="assets/css/fraktion.css?v=5">
   <style>
     .wrap { width: min(1200px, 100% - 40px); margin-inline: auto; }
     section { padding: 110px 0; }
@@ -147,21 +147,29 @@
     .compare-head > div:last-child { background: var(--ink) !important; color: var(--yellow) !important; }
 
     /* Pricing */
-    .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 52px; }
-    .plan { position: relative; display: flex; flex-direction: column; padding: 30px 26px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-xl); }
-    .plan.featured { background: var(--ink); color: #fff; border-color: var(--ink); box-shadow: 0 30px 60px rgba(14,14,12,.25); }
-    .plan .pill-yellow { position: absolute; top: -12px; left: 26px; }
-    .plan h3 { font-size: 15px; font-family: var(--mono); font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-    .plan.featured h3 { color: #B3AFA3; }
-    .plan-price { font-size: 64px; font-weight: 800; font-stretch: 108%; line-height: 1; margin: 18px 0 4px; }
-    .plan-unit { color: var(--muted); font-size: 15px; }
-    .plan.featured .plan-unit { color: #B3AFA3; }
-    .plan-blurb { margin: 18px 0; font-size: 15px; }
-    .plan ul { list-style: none; padding: 0; margin: 0 0 28px; display: grid; gap: 11px; font-size: 15px; }
-    .plan li { display: flex; gap: 10px; }
-    .plan li svg { width: 18px; height: 18px; color: var(--green); flex-shrink: 0; margin-top: 3px; }
-    .plan.featured li svg { color: var(--yellow); }
-    .plan .btn { margin-top: auto; }
+    .price-wrap { display: grid; grid-template-columns: 1fr 1.1fr; gap: 18px; margin-top: 52px; align-items: stretch; }
+    .price-card { display: flex; flex-direction: column; padding: 34px 32px; border-radius: var(--r-xl); background: var(--ink); color: #fff; }
+    .price-card .eyebrow { color: #B3AFA3; }
+    .price-big { font-size: clamp(64px, 8vw, 96px); font-weight: 800; font-stretch: 108%; line-height: 1; margin: 18px 0 6px; }
+    .price-big small { font-size: 18px; font-weight: 500; font-stretch: 100%; color: #B3AFA3; }
+    .price-card ul { list-style: none; padding: 0; margin: 24px 0 30px; display: grid; gap: 13px; font-size: 16px; }
+    .price-card li { display: flex; gap: 12px; }
+    .price-card li svg { width: 19px; height: 19px; color: var(--yellow); flex-shrink: 0; margin-top: 3px; }
+    .price-card .btn { margin-top: auto; }
+    .calc { padding: 34px 32px; border-radius: var(--r-xl); background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 18px; }
+    .calc-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .calc-bins { font-size: 44px; font-weight: 800; font-stretch: 108%; line-height: 1; }
+    .calc-bins small { font-size: 16px; font-weight: 500; color: var(--muted); font-stretch: 100%; }
+    .calc input[type=range] { width: 100%; accent-color: var(--ink); height: 28px; }
+    .calc-scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: -10px; }
+    .calc-stack { display: flex; flex-wrap: wrap; gap: 6px; min-height: 64px; align-content: flex-start; }
+    .calc-stack i { width: 30px; height: 22px; border-radius: 4px; background: var(--ink); border-top: 6px solid var(--yellow); }
+    .calc-stack i.std { outline: 2px dashed var(--yellow-deep); outline-offset: 1px; }
+    .calc-total { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .calc-total div { padding: 14px 16px; border-radius: var(--r); background: var(--paper); }
+    .calc-total b { display: block; font-size: 26px; font-weight: 800; font-stretch: 104%; }
+    .calc-total span { font-size: 13px; color: var(--muted); }
+    .calc-total .free { background: var(--yellow-soft); }
     .addons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 18px; }
     .addon { display: flex; gap: 14px; align-items: center; padding: 18px 20px; border: 1px dashed var(--line-strong); border-radius: var(--r-lg); }
     .addon .row-icon { background: var(--yellow-soft); }
@@ -221,7 +229,8 @@
       .fc-1 { left: 10px; } .fc-2 { right: 10px; }
       .steps { grid-template-columns: repeat(2, 1fr); }
       .step::after { display: none; }
-      .plans, .addons { grid-template-columns: 1fr; max-width: 520px; }
+      .price-wrap { grid-template-columns: 1fr; }
+      .addons { grid-template-columns: 1fr; max-width: 520px; }
     }
     @media (max-width: 760px) {
       section { padding: 76px 0; }
@@ -270,7 +279,7 @@
   <section class="hero on-dark">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <div class="hero-badge"><span class="pill pill-yellow">New</span> Founding members get their first month free</div>
+        <div class="hero-badge"><span class="pill pill-yellow">New</span> Founding members get 3 months free</div>
         <h1 class="display">Storage from your <em>doorstep.</em></h1>
         <p class="lede">Fill a bin. We pick it up. When you want it back, tap it in your dashboard and we drive it to your door. No locker, no truck rental, no digging.</p>
         <div class="hero-ctas">
@@ -294,7 +303,7 @@
               <div class="frame-stats">
                 <div><b>5</b><small>In storage</small></div>
                 <div><b>2</b><small>With you</small></div>
-                <div><b id="mock-credits">8</b><small>Delivery credits</small></div>
+                <div><b id="mock-credits">8</b><small>Free deliveries left</small></div>
               </div>
               <div class="frame-bins">
                 <div class="mini-bin" id="mock-hot"><div class="bin-lid"></div><div>
@@ -403,7 +412,7 @@ Wreath</textarea></div>
             </div>
             <div class="field"><span class="label">Day</span><div id="demo-days"></div></div>
             <div class="field"><span class="label">Time window</span><div id="demo-windows"></div></div>
-            <div class="modal-summary"><span>Uses <b>1</b> of your <b>10</b> yearly delivery credits</span><button type="button" class="btn btn-dark btn-sm" id="demo-book">Book delivery</button></div>
+            <div class="modal-summary"><span><b>Free</b> — 9 of 10 free deliveries left this year</span><button type="button" class="btn btn-dark btn-sm" id="demo-book">Book delivery</button></div>
           </div>
 
           <!-- Add bins -->
@@ -418,7 +427,7 @@ Wreath</textarea></div>
                 <div id="add-stack" style="display:grid;gap:6px;width:180px"></div>
               </div>
             </div>
-            <div class="price-calc"><span>Added to your Starter plan</span><span><b id="add-price">$15</b> / month</span></div>
+            <div class="price-calc"><span>Added to your monthly bill</span><span><b id="add-price">$15</b> / month</span></div>
           </div>
 
           <!-- Track -->
@@ -465,13 +474,36 @@ Wreath</textarea></div>
       <div class="section-intro center">
         <span class="eyebrow">Pricing</span>
         <h2 class="display h2">Pay for bins, <br>not empty space.</h2>
-        <p class="lede">Pickup of your filled bins is always included. Delivery credits cover trips back to you.</p>
+        <p class="lede">One simple price. Your bill follows your bin count — add bins and it goes up, send them home and it goes down.</p>
       </div>
-      <div class="plans" id="plans"></div>
+      <div class="price-wrap">
+        <div class="price-card">
+          <span class="eyebrow">Pay per bin</span>
+          <div class="price-big">$5<small> / bin / month</small></div>
+          <ul>
+            <li><span data-icon="check"></span><span>Most homes start with <b>5 bins</b> — minimum 3</span></li>
+            <li><span data-icon="check"></span><span><b>10 free deliveries</b> a year, then $9.99 each</span></li>
+            <li><span data-icon="check"></span><span>Pickups to storage always free</span></li>
+            <li><span data-icon="check"></span><span>Full dashboard: labels, search, tracking</span></li>
+            <li><span data-icon="check"></span><span>No contract. Cancel any time.</span></li>
+          </ul>
+          <a class="btn btn-primary btn-lg btn-block" href="auth.html?mode=signup">Get started — 3 months free</a>
+        </div>
+        <div class="calc">
+          <div class="calc-top"><span class="eyebrow">How many bins?</span><span class="calc-bins"><output id="calc-n">5</output><small> bins · <span id="calc-l">510</span> L</small></span></div>
+          <input type="range" id="calc-range" min="3" max="25" value="5" aria-label="Number of bins">
+          <div class="calc-scale"><span>3</span><span>5 · standard</span><span>25</span></div>
+          <div class="calc-stack" id="calc-stack" aria-hidden="true"></div>
+          <div class="calc-total">
+            <div><b id="calc-m">$25</b><span>per month</span></div>
+            <div class="free"><b id="calc-s">$75</b><span>saved in your 3 free months</span></div>
+          </div>
+        </div>
+      </div>
       <div class="addons">
-        <div class="addon"><span class="row-icon" data-icon="truck"></span><div><b>Extra delivery</b><small>$9.99 once your credits run out</small></div></div>
+        <div class="addon"><span class="row-icon" data-icon="truck"></span><div><b>Extra delivery</b><small>$9.99 after your 10 free each year</small></div></div>
         <div class="addon"><span class="row-icon" data-icon="box"></span><div><b>Oversized items</b><small>$7/month — trees, bikes, golf bags</small></div></div>
-        <div class="addon"><span class="row-icon" data-icon="warehouse"></span><div><b>Pickups</b><small>Always included, on every plan</small></div></div>
+        <div class="addon"><span class="row-icon" data-icon="warehouse"></span><div><b>Pickups</b><small>Always free, as often as you like</small></div></div>
       </div>
     </div>
   </section>
@@ -523,8 +555,8 @@ Wreath</textarea></div>
       <div class="founding">
         <div>
           <span class="eyebrow">Founding members</span>
-          <h2 class="display h2" style="margin-top:16px">First month <em>free.</em></h2>
-          <p class="lede" style="margin-top:18px">We're opening our first facility and taking a limited group of founding households. Get on the list and we'll reach out to book your bin drop-off.</p>
+          <h2 class="display h2" style="margin-top:16px">3 months <em>free.</em></h2>
+          <p class="lede" style="margin-top:18px">We're opening our first facility and taking a limited group of founding households. Sign up now and your first three months of storage are on us — we'll reach out to book your bin drop-off.</p>
           <div class="areas"><span data-icon-before="pin">Oakville</span><span data-icon-before="pin">Burlington</span><span data-icon-before="pin">Mississauga</span></div>
         </div>
         <div>
@@ -550,7 +582,9 @@ Wreath</textarea></div>
         <details><summary>Do I need to be home?</summary><p>No. Add access notes in your account — a side door, garage code or porch — and we'll leave bins there.</p></details>
         <details><summary>What can't I store?</summary><p>Anything perishable, flammable or hazardous, anything alive, cash, firearms, or items of high value like jewellery. If you're unsure, ask us first.</p></details>
         <details><summary>Does anyone else's stuff go in my bin?</summary><p>Never. Your bins are sealed, serial-numbered and only ever opened by you.</p></details>
-        <details><summary>How do delivery credits work?</summary><p>Each plan comes with yearly credits — 4 on Starter, 10 on Family, unlimited on Pro. One credit covers one delivery, however many bins are in it. Extra deliveries are $9.99. Pickups are always free.</p></details>
+        <details><summary>How do deliveries work?</summary><p>Every account gets 10 free deliveries a year — one delivery can bring back as many bins as you like. After 10, it's $9.99 a trip. Sending bins back to storage is always free.</p></details>
+        <details><summary>How many bins do I need?</summary><p>Most homes start with 5 — about 510 litres (18 cubic feet) of seasonal stuff. The minimum is 3, and you can add more any time from your dashboard.</p></details>
+        <details><summary>What's the founding-member offer?</summary><p>Sign up during launch and your first three months of storage are free. We'll ask for a card when we drop off your bins; billing starts after the free months, and you can cancel before then.</p></details>
         <details><summary>Can I cancel?</summary><p>Any time. We'll deliver your bins back and stop billing at the end of the month.</p></details>
       </div>
     </div>
@@ -567,6 +601,6 @@ Wreath</textarea></div>
   </div>
 </footer>
 
-<script type="module" src="assets/js/site.js?v=4"></script>
+<script type="module" src="assets/js/site.js?v=5"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 // Marketing site interactions.
-import { icon, esc, toast, dateStrip, windowChoices, serviceDays, EMOJIS } from './ui.js?v=4';
-import { PLANS, joinWaitlist, init } from './api.js?v=4';
+import { icon, esc, toast, dateStrip, windowChoices, serviceDays, EMOJIS } from './ui.js?v=5';
+import { PRICING, joinWaitlist, init } from './api.js?v=5';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -19,27 +19,19 @@ menuBtn?.addEventListener('click', () => {
 });
 $$('#nav-links a').forEach((a) => a.addEventListener('click', () => $('#nav-links').classList.remove('open')));
 
-// Pricing cards
-$('#plans').innerHTML = Object.entries(PLANS).map(([key, p]) => {
-  const featured = key === 'family';
-  const credits = p.credits === null ? 'Unlimited deliveries' : `${p.credits} delivery credits a year`;
-  const bins = p.bins ? `${p.bins} bins included` : 'Add bins one at a time';
-  return `<div class="plan ${featured ? 'featured' : ''}">
-    ${featured ? '<span class="pill pill-yellow pill-plain">Most popular</span>' : ''}
-    <h3>${p.name}</h3>
-    <div class="plan-price">${p.priceLabel}</div>
-    <div class="plan-unit">${p.unit}</div>
-    <p class="plan-blurb">${p.blurb}</p>
-    <ul>
-      <li>${icon.check}<span>${bins}</span></li>
-      <li>${icon.check}<span>${credits}</span></li>
-      <li>${icon.check}<span>Free pickups, always</span></li>
-      <li>${icon.check}<span>Full dashboard: labels, search, tracking</span></li>
-      ${key === 'pro' ? `<li>${icon.check}<span>Oversized items priority</span></li>` : ''}
-    </ul>
-    <a class="btn ${featured ? 'btn-primary' : 'btn-dark'} btn-lg btn-block" href="auth.html?mode=signup&plan=${key}">Choose ${p.name}</a>
-  </div>`;
-}).join('');
+// Pricing calculator
+const range = $('#calc-range');
+const renderCalc = () => {
+  const n = +range.value;
+  const monthly = n * PRICING.binCents / 100;
+  $('#calc-n').textContent = n;
+  $('#calc-l').textContent = (n * 102).toLocaleString('en-CA');
+  $('#calc-m').textContent = `$${monthly}`;
+  $('#calc-s').textContent = `$${monthly * PRICING.founderFreeMonths}`;
+  $('#calc-stack').innerHTML = Array.from({ length: n }, (_, i) => `<i class="${i < PRICING.standardBins ? 'std' : ''}"></i>`).join('');
+};
+range.addEventListener('input', renderCalc);
+renderCalc();
 
 /* ---------- Hero mockup: a bin goes from storage to your door ---------- */
 (function heroLoop() {
@@ -107,7 +99,7 @@ $('#demo-book').addEventListener('click', () => {
 let qty = 3;
 const renderQty = () => {
   $('#add-qty').textContent = qty;
-  $('#add-price').textContent = `$${qty * PLANS.starter.price}`;
+  $('#add-price').textContent = `$${qty * PRICING.binCents / 100}`;
   $('#add-stack').innerHTML = Array.from({ length: Math.min(qty, 6) }, () => `<div style="height:14px;border-radius:4px;background:var(--yellow);box-shadow:inset 0 -5px 0 rgba(0,0,0,.18)"></div>`).join('') + (qty > 6 ? `<small style="text-align:center;color:var(--muted)">+${qty - 6} more</small>` : '');
 };
 $('#add-minus').addEventListener('click', () => { qty = Math.max(1, qty - 1); renderQty(); });

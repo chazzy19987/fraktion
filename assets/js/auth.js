@@ -1,12 +1,11 @@
-import { icon, esc, setBusy } from './ui.js?v=4';
-import { init, getUser, signIn, signUp, sendPasswordReset, updatePassword, PLANS, getMode } from './api.js?v=4';
+import { icon, esc, setBusy } from './ui.js?v=5';
+import { init, getUser, signIn, signUp, sendPasswordReset, updatePassword, PRICING, getMode } from './api.js?v=5';
 
 const $ = (s) => document.querySelector(s);
 document.querySelectorAll('[data-icon]').forEach((el) => { el.innerHTML = icon[el.dataset.icon] || ''; });
 
 const params = new URLSearchParams(location.search);
 let view = params.get('mode') || 'login';
-const plan = PLANS[params.get('plan')] ? params.get('plan') : 'family';
 const next = params.get('next') || '';
 
 const card = $('#card');
@@ -36,9 +35,9 @@ const views = {
         <div class="field"><label class="label" for="password">Password</label><input class="input" id="password" name="password" type="password" autocomplete="new-password" minlength="8" required><span class="hint">At least 8 characters</span></div>
         <div class="field"><label class="label" for="postal_code">Postal code</label><input class="input" id="postal_code" name="postal_code" autocomplete="postal-code" maxlength="7" required placeholder="L6M 2V4"></div>
       </div>
-      <div class="field" style="margin-top:14px"><span class="label">Plan</span>
-        <div class="plan-pick">${Object.entries(PLANS).map(([k, p]) => `<label class="choice"><input type="radio" name="plan" value="${k}" ${k === plan ? 'checked' : ''}><span>${p.name}<small>${p.priceLabel} ${k === 'starter' ? '/bin' : '/mo'}</small></span></label>`).join('')}</div>
-        <span class="hint">You can change plans any time. Founding members get their first month free.</span>
+      <div class="notice" style="margin-top:16px;padding:14px 16px;font-size:14px">
+        <b>$5 per bin, per month.</b> Most homes start with ${PRICING.standardBins} bins (minimum ${PRICING.minBins}). ${PRICING.deliveriesPerYear} free deliveries a year, pickups always free.
+        <div style="margin-top:6px;font-weight:650">Founding members: first ${PRICING.founderFreeMonths} months free.</div>
       </div>
       <div class="err" id="err" role="alert"></div>
       <button class="btn btn-primary btn-lg btn-block" style="margin-top:18px">Create account</button>
@@ -105,7 +104,6 @@ async function onSubmit(e) {
     if (view === 'signup') {
       const postal = d.postal_code.trim().toUpperCase();
       if (!POSTAL.test(postal)) throw new Error('That postal code doesn’t look right — try the format L6M 2V4.');
-      sessionStorage.setItem('fraktion-plan', d.plan);
       const { needsConfirmation } = await signUp({ email: d.email.trim(), password: d.password, full_name: d.full_name.trim(), postal_code: postal.replace(/^(\w{3})(\w{3})$/, '$1 $2') });
       if (needsConfirmation) render('sent', d.email.trim());
       else location.href = 'app.html?welcome=1';

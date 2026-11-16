@@ -4,12 +4,23 @@
 //   • demo — everything stored in this browser, so the site works before any keys are added
 // Every page talks to this file only, so swapping or extending the backend happens here.
 
-import { isoDate, serviceDays } from './ui.js?v=4';
+import { isoDate, serviceDays } from './ui.js?v=5';
 
+// One simple plan: pay for the bins you use.
+export const PRICING = {
+  name: 'Pay per bin',
+  binCents: 500,            // $5 per bin, per month
+  minBins: 3,               // smallest account
+  standardBins: 5,          // the usual starter pack
+  deliveriesPerYear: 10,    // free deliveries back to you each year
+  founderFreeMonths: 3,     // founding-member offer
+};
+// Kept so older accounts (starter/family/pro) still display; everyone is on "standard" now.
 export const PLANS = {
-  starter: { name: 'Starter', price: 5, priceLabel: '$5', unit: 'per bin / month', bins: null, credits: 4, blurb: 'Pay per bin. Perfect for seasonal stuff.' },
-  family: { name: 'Family', price: 35, priceLabel: '$35', unit: 'per month · 10 bins', bins: 10, credits: 10, blurb: 'The sweet spot for a busy household.' },
-  pro: { name: 'Pro', price: 79, priceLabel: '$79', unit: 'per month · 25 bins', bins: 25, credits: null, blurb: 'Unlimited deliveries. Basement, cleared.' },
+  standard: { name: PRICING.name, credits: PRICING.deliveriesPerYear },
+  starter: { name: PRICING.name, credits: PRICING.deliveriesPerYear },
+  family: { name: PRICING.name, credits: PRICING.deliveriesPerYear },
+  pro: { name: PRICING.name, credits: PRICING.deliveriesPerYear },
 };
 export const EXTRA_DELIVERY_CENTS = 999;
 export const OVERSIZED_CENTS = 700;
@@ -48,7 +59,7 @@ const fail = (error) => { if (error) throw new Error(error.message || String(err
 /* =====================================================================
    DEMO STORE — mirrors the database rules in supabase/schema.sql
    ===================================================================== */
-const DEMO_KEY = 'fraktion-demo-v3';
+const DEMO_KEY = 'fraktion-demo-v4';
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
 const nowIso = () => new Date().toISOString();
 const daysFromNow = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d; };
@@ -90,9 +101,9 @@ function seed() {
     { id: uid(), customer_id: 'cust-2', item_id: 'item-table', quantity: 2, start_date: isoDate(sd[3]), end_date: isoDate(sd[4]), time_window: 'morning', address: '214 Lakeshore Rd E, Oakville, L6J 1H8', notes: 'Birthday party', total_cents: 10000, status: 'scheduled', paid: true, created_at: daysFromNow(-2).toISOString() },
   ];
   const profiles = {
-    [me]: { id: me, email: 'alex@example.com', full_name: 'Alex Morgan', phone: '905-555-0142', address_line1: '1234 Glen Abbey Gate', address_line2: '', city: 'Oakville', postal_code: 'L6M 2V4', access_notes: 'Garage code 4412', plan: 'family', delivery_credits: 8, subscription_status: 'active', is_admin: true, created_at: daysFromNow(-60).toISOString() },
-    'cust-2': { id: 'cust-2', email: 'jordan@example.com', full_name: 'Jordan Patel', phone: '905-555-0199', address_line1: '214 Lakeshore Rd E', city: 'Oakville', postal_code: 'L6J 1H8', plan: 'starter', delivery_credits: 3, subscription_status: 'active', created_at: daysFromNow(-30).toISOString() },
-    'cust-3': { id: 'cust-3', email: 'sam@example.com', full_name: 'Sam Rivera', phone: '289-555-0110', address_line1: '88 Brant St', city: 'Burlington', postal_code: 'L7R 2G1', plan: 'starter', delivery_credits: 4, subscription_status: 'none', created_at: daysFromNow(-1).toISOString() },
+    [me]: { id: me, email: 'alex@example.com', full_name: 'Alex Morgan', phone: '905-555-0142', address_line1: '1234 Glen Abbey Gate', address_line2: '', city: 'Oakville', postal_code: 'L6M 2V4', access_notes: 'Garage code 4412', plan: 'standard', delivery_credits: 8, subscription_status: 'active', is_admin: true, created_at: daysFromNow(-60).toISOString() },
+    'cust-2': { id: 'cust-2', email: 'jordan@example.com', full_name: 'Jordan Patel', phone: '905-555-0199', address_line1: '214 Lakeshore Rd E', city: 'Oakville', postal_code: 'L6J 1H8', plan: 'standard', delivery_credits: 9, subscription_status: 'active', created_at: daysFromNow(-30).toISOString() },
+    'cust-3': { id: 'cust-3', email: 'sam@example.com', full_name: 'Sam Rivera', phone: '289-555-0110', address_line1: '88 Brant St', city: 'Burlington', postal_code: 'L7R 2G1', plan: 'standard', delivery_credits: 10, subscription_status: 'none', created_at: daysFromNow(-1).toISOString() },
   };
   return { me, signedIn: false, profiles, bins, requests, items, bookings, waitlist: [], nextCode: 24 };
 }
@@ -247,7 +258,12 @@ export async function createRequest({ type, bin_ids = [], quantity = 0, schedule
         if (!bin_ids.length) throw new Error('Choose at least one bin');
         const need = type === 'delivery' ? 'stored' : 'with_customer';
         if (bin_ids.some((id) => s.bins.find((b) => b.id === id)?.status !== need)) throw new Error('One or more bins are not available for this request');
-      } else if (quantity < 1 || quantity > 20) throw new Error('Choose between 1 and 20 bins');
+      } else {
+        if (quantity < 1 || quantity > 20) throw new Error('Choose between 1 and 20 bins');
+        const owned = s.bins.filter((b) => b.owner_id === s.me && b.kind === 'bin').length;
+        const coming = s.requests.filter((r) => r.customer_id === s.me && r.type === 'new_bins' && ['requested', 'scheduled', 'en_route'].includes(r.status)).reduce((n, r) => n + r.quantity, 0);
+        if (owned + coming + quantity < PRICING.minBins) throw new Error(`Accounts start at ${PRICING.minBins} bins`);
+      }
       const r = { id: uid(), customer_id: s.me, type, bin_ids, quantity, scheduled_date, time_window, notes, status: 'requested', used_credit: false, fee_cents: 0, address: addressOf(p), created_at: nowIso(), updated_at: nowIso() };
       if (type === 'delivery') {
         if (p.delivery_credits === null) r.used_credit = true;
@@ -346,10 +362,10 @@ async function callFn(name, body) {
   return json;
 }
 export const billingEnabled = () => mode === 'live' && !!cfg.stripeEnabled;
-export async function startPlanCheckout(plan, quantity = 1) {
+export async function startPlanCheckout() {
   await init();
-  if (!billingEnabled()) throw new Error('Billing goes live once Stripe keys are added — see the README.');
-  const { url } = await callFn('checkout', { kind: 'plan', plan, quantity });
+  if (!billingEnabled()) throw new Error('Card payments go live once Stripe keys are added — see the README.');
+  const { url } = await callFn('checkout', { kind: 'plan' });
   location.href = url;
 }
 export async function startRentalCheckout(booking_id) {
@@ -389,7 +405,12 @@ export async function adminSetRequestStatus(id, status) {
   await init();
   if (mode === 'demo') return delay(tx((s) => { const r = s.requests.find((x) => x.id === id); demoAdvance(s, r, status); return r; }));
   const { data, error } = await sb.from('requests').update({ status }).eq('id', id).select().single();
-  fail(error); return data;
+  fail(error);
+  // New bins change what the customer pays — update their Stripe subscription quantity.
+  if (data.type === 'new_bins' && status === 'completed' && billingEnabled()) {
+    await callFn('sync-billing', { customer_id: data.customer_id }).catch(() => {});
+  }
+  return data;
 }
 
 export async function adminSetBookingStatus(id, status) {

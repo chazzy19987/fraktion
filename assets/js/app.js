@@ -2,8 +2,8 @@
 import {
   icon, esc, money, fmtDate, fmtRelative, isoDate, serviceDays, toast, modal, confirmModal, setBusy,
   dateStrip, windowChoices, WINDOWS, BIN_STATUS, REQ_STATUS, REQ_TYPE, EMOJIS,
-} from './ui.js?v=5';
-import * as api from './api.js?v=5';
+} from './ui.js?v=6';
+import * as api from './api.js?v=6';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -387,7 +387,7 @@ function addBinsModal() {
   qty = Math.max(qty, minQty);
   const priceLine = () => {
     const total = Math.max(owned + coming + qty, PR.minBins);
-    return `<span>${qty} × ${money(PR.binCents)}/month</span><span>Bins total: <b>${money(total * PR.binCents)}/month</b> for ${total}</span>`;
+    return `<span>${qty} × ${money(PR.binCents)}/month + ${money(qty * PR.depositCents)} refundable deposit</span><span>Bins total: <b>${money(total * PR.binCents)}/month</b> for ${total}</span>`;
   };
   modal({
     title: 'Get empty bins',
@@ -575,6 +575,7 @@ function viewAccount() {
         <div class="plan-now"><div><span class="eyebrow">Your plan</span><h3 style="margin-top:6px">${money(monthlyCents())}<span style="font-size:15px;font-weight:500;color:var(--muted)"> / month</span></h3><div class="hint">${PR.name} · ${money(PR.binCents)} per bin${binCount() < PR.minBins ? ` · ${PR.minBins}-bin minimum` : ''}</div></div><span class="pill ${p.subscription_status === 'active' ? 'pill-done' : 'pill-pending'}">${subLabel}</span></div>
         <dl class="kv">
           <dt>Bins</dt><dd>${binCount()} × ${money(PR.binCents)}</dd>
+          <dt>Refundable deposit</dt><dd>${money(binCount() * PR.depositCents)}</dd>
           <dt>Oversized items</dt><dd>${state.bins.filter((b) => b.kind === 'oversized').length} × ${money(api.OVERSIZED_CENTS)}</dd>
           <dt>Free deliveries</dt><dd>${p.delivery_credits === null ? 'Unlimited' : `${p.delivery_credits} of ${PR.deliveriesPerYear} left this year`}</dd>
           <dt>Member since</dt><dd>${fmtDate(p.created_at, { month: 'long', year: 'numeric' })}</dd>
@@ -620,13 +621,14 @@ function planModal() {
     body: `<div class="card card-pad" style="background:var(--paper)">
         <dl class="kv" style="margin-top:0">
           <dt>Bins</dt><dd>${bins} × ${money(PR.binCents)}/month</dd>
+          <dt>Refundable deposit</dt><dd>${bins} × ${money(PR.depositCents)} = ${money(bins * PR.depositCents)}, charged today</dd>
           <dt>Free deliveries</dt><dd>${PR.deliveriesPerYear} a year, then ${money(api.EXTRA_DELIVERY_CENTS)} each</dd>
           <dt>Pickups</dt><dd>Always free</dd>
           <dt>First ${PR.founderFreeMonths} months</dt><dd style="color:var(--green)">$0</dd>
           <dt>After that</dt><dd>${money(monthlyCents())}/month</dd>
         </dl>
       </div>
-      <p class="hint" style="margin-top:12px">Your bill follows your bin count — add bins and it goes up, send them home for good and it goes down. Cancel any time.</p>
+      <p class="hint" style="margin-top:12px">Your bill follows your bin count — add bins and it goes up, send them home for good and it goes down. Cancel any time; the deposit comes back once your bins are returned.</p>
       ${api.billingEnabled() ? '' : '<p class="hint" style="margin-top:10px">Card payments go live once Stripe is connected. Until then, we\'ll invoice founding members directly.</p>'}`,
     actions: `<button type="button" class="btn btn-ghost" data-close>Not now</button><button class="btn btn-primary" type="submit">Add a card</button>`,
     onMount: (m) => {

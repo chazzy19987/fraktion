@@ -1,6 +1,6 @@
 // Keeps a customer's Stripe subscription in step with their bin count.
 // Called from the ops board after a bin drop-off is completed (staff only).
-import { json, userFromRequest, db, stripe, binPrice, oversizedPrice, billableCounts } from '../lib/shared.mjs';
+import { json, userFromRequest, db, stripe, binPrice, oversizedPrice, billableCounts, DEPOSIT_CENTS } from '../lib/shared.mjs';
 
 export default async (req) => {
   if (req.method !== 'POST') return json(405, { error: 'POST only' });
@@ -20,6 +20,12 @@ export default async (req) => {
     const counts = await billableCounts(customer_id);
     const want = [[binPrice(), counts.bins], [oversizedPrice(), counts.oversized]].filter(([price]) => price);
     const items = [];
+    // Deposit for bins added since the subscription last changed, added to the next invoice.
+    const binItem = sub.items.data.find((i) => i.price.id === binPrice());
+    const addedBins = binItem ? counts.bins - binItem.quantity : 0;
+    if (addedBins > 0 && DEPOSIT_CENTS > 0) {
+      await stripe('invoiceitems', { customer: p.stripe_customer_id, currency: 'cad', amount: addedBins * DEPOSIT_CENTS, description: `Refundable bin deposit × ${addedBins}` });
+    }
     for (const [price, quantity] of want) {
       const existing = sub.items.data.find((i) => i.price.id === price);
       if (existing) items.push(quantity ? { id: existing.id, quantity } : { id: existing.id, deleted: 'true' });

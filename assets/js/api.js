@@ -4,12 +4,13 @@
 //   • demo — everything stored in this browser, so the site works before any keys are added
 // Every page talks to this file only, so swapping or extending the backend happens here.
 
-import { isoDate, serviceDays } from './ui.js?v=5';
+import { isoDate, serviceDays } from './ui.js?v=6';
 
 // One simple plan: pay for the bins you use.
 export const PRICING = {
   name: 'Pay per bin',
-  binCents: 500,            // $5 per bin, per month
+  binCents: 700,            // $7 per bin, per month
+  depositCents: 2000,       // refundable deposit per bin, returned on cancel
   minBins: 3,               // smallest account
   standardBins: 5,          // the usual starter pack
   deliveriesPerYear: 10,    // free deliveries back to you each year

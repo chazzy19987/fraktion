@@ -1,5 +1,5 @@
-import { icon, esc, setBusy } from './ui.js?v=5';
-import { init, getUser, signIn, signUp, sendPasswordReset, updatePassword, PRICING, getMode } from './api.js?v=5';
+import { icon, esc, setBusy } from './ui.js?v=6';
+import { init, getUser, signIn, signUp, sendPasswordReset, updatePassword, PRICING, getMode } from './api.js?v=6';
 
 const $ = (s) => document.querySelector(s);
 document.querySelectorAll('[data-icon]').forEach((el) => { el.innerHTML = icon[el.dataset.icon] || ''; });
@@ -36,7 +36,7 @@ const views = {
         <div class="field"><label class="label" for="postal_code">Postal code</label><input class="input" id="postal_code" name="postal_code" autocomplete="postal-code" maxlength="7" required placeholder="L6M 2V4"></div>
       </div>
       <div class="notice" style="margin-top:16px;padding:14px 16px;font-size:14px">
-        <b>$5 per bin, per month.</b> Most homes start with ${PRICING.standardBins} bins (minimum ${PRICING.minBins}). ${PRICING.deliveriesPerYear} free deliveries a year, pickups always free.
+        <b>$${PRICING.binCents / 100} per bin, per month.</b> Most homes start with ${PRICING.standardBins} bins (minimum ${PRICING.minBins}), plus a $${PRICING.depositCents / 100} refundable deposit per bin. ${PRICING.deliveriesPerYear} free deliveries a year, pickups always free.
         <div style="margin-top:6px;font-weight:650">Founding members: first ${PRICING.founderFreeMonths} months free.</div>
       </div>
       <div class="err" id="err" role="alert"></div>

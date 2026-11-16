@@ -54,7 +54,7 @@ update public.profiles set is_admin = true where email = 'you@example.com';
 Until this is set up, plan and rental buttons tell customers that card payment is coming — bookings still save, so you can invoice founding members directly.
 
 1. In Stripe (start in **Test mode**), create **recurring monthly prices in CAD**, both priced **per unit**:
-   - Storage bin — $5.00 (quantity = number of bins, minimum 3)
+   - Storage bin — $7.00 (quantity = number of bins, minimum 3)
    - Oversized item — $7.00 (optional)
 2. Add to Netlify:
 
@@ -66,6 +66,7 @@ Until this is set up, plan and rental buttons tell customers that card payment i
 | `STRIPE_WEBHOOK_SECRET` | from step 3 |
 | `STRIPE_FOUNDING_TRIAL_DAYS` | `90` for the founding-member "3 months free" offer |
 | `STRIPE_AUTOMATIC_TAX` | optional, `true` if Stripe Tax is set up for HST |
+| `BIN_DEPOSIT_CENTS` | optional, deposit per bin in cents (default `2000` = $20) |
 
 3. **Developers → Webhooks → Add endpoint**: `https://YOUR-SITE/.netlify/functions/stripe-webhook`, events `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`.
 4. **Settings → Billing → Customer portal**: turn it on (lets customers update cards, see invoices, switch plans).
@@ -79,7 +80,8 @@ The webhook records each customer's subscription status, sets their 10 free deli
 All rules live in the database (`supabase/schema.sql`), so they hold no matter what the browser sends:
 
 - **Customers can** relabel bins (name, icon, tags, contents), edit their address, and create or cancel *unconfirmed* requests and bookings. They can't change bin status, plans, credits or anyone else's data.
-- **Pricing**: one plan — $5 per bin per month, 3-bin minimum, 5 bins is the standard first drop-off. Oversized items $7/month.
+- **Pricing**: one plan — $7 per bin per month, 3-bin minimum, 5 bins is the standard first drop-off. Oversized items $7/month.
+- **Deposit**: $20 per bin, refundable. Charged at checkout with the first invoice; bins added later get their deposit on the next invoice. Refund it from the Stripe dashboard (or by e-transfer for older charges) when a customer cancels and returns their bins. The ops board's Customers tab shows the deposit held for each customer. Change the amount with the `BIN_DEPOSIT_CENTS` environment variable and `depositCents` in `assets/js/api.js`.
 - **Deliveries**: 10 free a year for every account; after that each delivery carries a $9.99 fee (shown on the run sheet). Cancelling a delivery gives the free one back. Pickups are always free.
 - **Founding members**: first 3 months free, via the Stripe trial above.
 - **Request flow** (ops board buttons): Requested → **Confirm** → Scheduled → **Start trip** → On the way → **Mark done**. Bins update automatically: out for delivery → with customer, or heading to storage → stored. Completing a **new bins** drop-off creates that many serial-numbered bins (`FRK-0001`…) on the customer's account.

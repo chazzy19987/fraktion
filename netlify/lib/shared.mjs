@@ -67,6 +67,7 @@ export function verifyStripeSignature(rawBody, header, secret, toleranceSec = 30
 
 export const FREE_DELIVERIES = 10;     // per year, every account
 export const MIN_BINS = 3;
+export const DEPOSIT_CENTS = parseInt(env('BIN_DEPOSIT_CENTS') || '2000', 10); // refundable, per bin
 export const binPrice = () => env('STRIPE_PRICE_BIN');            // $5/month, per unit
 export const oversizedPrice = () => env('STRIPE_PRICE_OVERSIZED'); // optional, $7/month per unit
 

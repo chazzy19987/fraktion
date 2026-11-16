@@ -1,6 +1,6 @@
 // Ops board: the daily run sheet, customers, bins, rentals and waitlist.
-import { icon, esc, money, fmtDate, fmtRelative, isoDate, toast, confirmModal, setBusy, WINDOWS, BIN_STATUS, REQ_STATUS, REQ_TYPE } from './ui.js?v=5';
-import * as api from './api.js?v=5';
+import { icon, esc, money, fmtDate, fmtRelative, isoDate, toast, confirmModal, setBusy, WINDOWS, BIN_STATUS, REQ_STATUS, REQ_TYPE } from './ui.js?v=6';
+import * as api from './api.js?v=6';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -158,12 +158,13 @@ function customers() {
       <td>${esc(api.PLANS[p.plan]?.name || p.plan)}<div class="hint">${esc(p.subscription_status)}</div></td>
       <td class="mono">${bins.filter((b) => b.status === 'stored').length} / ${bins.length}</td>
       <td class="mono">${p.delivery_credits === null ? '∞' : p.delivery_credits}</td>
+      <td class="mono">${money(bins.filter((b) => b.kind === 'bin').length * api.PRICING.depositCents)}</td>
       <td class="hint">${fmtRelative(p.created_at)}</td>
     </tr>`;
   }).join('');
   root.innerHTML = shell('Customers', `${D.profiles.length} accounts`, `<div class="table-wrap"><table class="table">
-    <thead><tr><th>Customer</th><th>Phone</th><th>Address</th><th>Plan</th><th>Stored / bins</th><th>Credits</th><th>Joined</th></tr></thead>
-    <tbody>${rows || '<tr><td colspan="7">No customers yet.</td></tr>'}</tbody></table></div>`);
+    <thead><tr><th>Customer</th><th>Phone</th><th>Address</th><th>Plan</th><th>Stored / bins</th><th>Free deliveries</th><th>Deposit held</th><th>Joined</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="8">No customers yet.</td></tr>'}</tbody></table></div>`);
 }
 
 /* ----------------------------------------------------------------- bins */

@@ -1,5 +1,5 @@
 // Starts Stripe Checkout for a plan subscription or a rental booking.
-import { json, userFromRequest, db, stripe, binPrice, oversizedPrice, billableCounts, siteUrl } from '../lib/shared.mjs';
+import { json, userFromRequest, db, stripe, binPrice, oversizedPrice, billableCounts, siteUrl, DEPOSIT_CENTS } from '../lib/shared.mjs';
 
 async function ensureCustomer(profile) {
   if (profile.stripe_customer_id) return profile.stripe_customer_id;
@@ -31,6 +31,10 @@ export default async (req) => {
       const trial = parseInt(process.env.STRIPE_FOUNDING_TRIAL_DAYS || '0', 10);
       const line_items = [{ price: binPrice(), quantity: counts.bins }];
       if (counts.oversized && oversizedPrice()) line_items.push({ price: oversizedPrice(), quantity: counts.oversized });
+      // Refundable bin deposit: a one-time charge on the first invoice (taken today, even during the free months).
+      if (DEPOSIT_CENTS > 0) {
+        line_items.push({ quantity: counts.bins, price_data: { currency: 'cad', unit_amount: DEPOSIT_CENTS, product_data: { name: 'Refundable bin deposit', description: 'Returned when you cancel and your bins come back' } } });
+      }
       const session = await stripe('checkout/sessions', {
         mode: 'subscription', customer, line_items,
         subscription_data: { metadata: { user_id: user.id, plan: 'standard' }, ...(trial > 0 && profile.subscription_status === 'none' ? { trial_period_days: trial } : {}) },

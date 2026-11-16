@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fraktion — Storage from your doorstep</title>
-  <meta name="description" content="Fill a bin, we pick it up. Tap the app when you want it back and we drive it to your door. From $5 a bin. Oakville, Burlington and Mississauga.">
+  <meta name="description" content="Fill a bin, we pick it up. Tap the app when you want it back and we drive it to your door. From $7 a bin. Oakville, Burlington and Mississauga.">
   <meta property="og:title" content="Fraktion — Storage from your doorstep">
-  <meta property="og:description" content="Fill a bin. We pick it up. Tap to get it back. From $5/bin/month.">
+  <meta property="og:description" content="Fill a bin. We pick it up. Tap to get it back. From $7/bin/month.">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/fraktion.css?v=5">
+  <link rel="stylesheet" href="assets/css/fraktion.css?v=6">
   <style>
     .wrap { width: min(1200px, 100% - 40px); margin-inline: auto; }
     section { padding: 110px 0; }
@@ -166,6 +166,7 @@
     .calc-stack i { width: 30px; height: 22px; border-radius: 4px; background: var(--ink); border-top: 6px solid var(--yellow); }
     .calc-stack i.std { outline: 2px dashed var(--yellow-deep); outline-offset: 1px; }
     .calc-total { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .calc-dep { font-size: 13px; color: var(--muted); margin-top: -8px; }
     .calc-total div { padding: 14px 16px; border-radius: var(--r); background: var(--paper); }
     .calc-total b { display: block; font-size: 26px; font-weight: 800; font-stretch: 104%; }
     .calc-total span { font-size: 13px; color: var(--muted); }
@@ -287,7 +288,7 @@
           <a href="app.html?demo=1" class="btn btn-ghost-dark btn-lg">Try the dashboard</a>
         </div>
         <div class="hero-proof">
-          <span data-icon-before="check">From $5 a bin, monthly</span>
+          <span data-icon-before="check">$7 a bin, monthly</span>
           <span data-icon-before="check">We do the driving</span>
           <span data-icon-before="check">Cancel any time</span>
         </div>
@@ -335,8 +336,8 @@
   </section>
 
   <div class="ticker" aria-hidden="true"><div class="ticker-inner">
-    <span>Storage from your doorstep</span><span>$5 a bin</span><span>We pick up</span><span>We drop off</span><span>Oakville</span><span>Burlington</span><span>Mississauga</span><span>Folding table rentals</span>
-    <span>Storage from your doorstep</span><span>$5 a bin</span><span>We pick up</span><span>We drop off</span><span>Oakville</span><span>Burlington</span><span>Mississauga</span><span>Folding table rentals</span>
+    <span>Storage from your doorstep</span><span>$7 a bin</span><span>We pick up</span><span>We drop off</span><span>Oakville</span><span>Burlington</span><span>Mississauga</span><span>Folding table rentals</span>
+    <span>Storage from your doorstep</span><span>$7 a bin</span><span>We pick up</span><span>We drop off</span><span>Oakville</span><span>Burlington</span><span>Mississauga</span><span>Folding table rentals</span>
   </div></div>
 
   <!-- HOW IT WORKS -->
@@ -427,7 +428,7 @@ Wreath</textarea></div>
                 <div id="add-stack" style="display:grid;gap:6px;width:180px"></div>
               </div>
             </div>
-            <div class="price-calc"><span>Added to your monthly bill</span><span><b id="add-price">$15</b> / month</span></div>
+            <div class="price-calc"><span>Added to your monthly bill</span><span><b id="add-price">$21</b> / month</span></div>
           </div>
 
           <!-- Track -->
@@ -460,10 +461,10 @@ Wreath</textarea></div>
       <div class="compare">
         <div class="compare-row compare-head"><div></div><div>Storage locker</div><div>Fraktion</div></div>
         <div class="compare-row"><div>Who does the driving</div><div>You — with a borrowed truck</div><div><span data-icon="check"></span>We do. Pickup and delivery to your door.</div></div>
-        <div class="compare-row"><div>What you pay for</div><div>The whole unit, full or not</div><div><span data-icon="check"></span>Only the bins you use, from $5 each</div></div>
+        <div class="compare-row"><div>What you pay for</div><div>The whole unit, full or not</div><div><span data-icon="check"></span>Only the bins you use, $7 each</div></div>
         <div class="compare-row"><div>Finding one thing</div><div>Unstack, dig, hope</div><div><span data-icon="check"></span>Search your labelled bins in seconds</div></div>
         <div class="compare-row"><div>Getting it back</div><div>Drive there during gate hours</div><div><span data-icon="check"></span>Tap it in the dashboard, pick a time window</div></div>
-        <div class="compare-row"><div>Commitment</div><div>Often a lease and a deposit</div><div><span data-icon="check"></span>Month to month. Cancel any time.</div></div>
+        <div class="compare-row"><div>Commitment</div><div>Often a lease and a deposit</div><div><span data-icon="check"></span>Month to month. Cancel any time and your deposit comes back.</div></div>
       </div>
     </div>
   </section>
@@ -479,12 +480,13 @@ Wreath</textarea></div>
       <div class="price-wrap">
         <div class="price-card">
           <span class="eyebrow">Pay per bin</span>
-          <div class="price-big">$5<small> / bin / month</small></div>
+          <div class="price-big">$7<small> / bin / month</small></div>
           <ul>
             <li><span data-icon="check"></span><span>Most homes start with <b>5 bins</b> — minimum 3</span></li>
             <li><span data-icon="check"></span><span><b>10 free deliveries</b> a year, then $9.99 each</span></li>
             <li><span data-icon="check"></span><span>Pickups to storage always free</span></li>
             <li><span data-icon="check"></span><span>Full dashboard: labels, search, tracking</span></li>
+            <li><span data-icon="check"></span><span>$20 refundable deposit per bin — back when you cancel</span></li>
             <li><span data-icon="check"></span><span>No contract. Cancel any time.</span></li>
           </ul>
           <a class="btn btn-primary btn-lg btn-block" href="auth.html?mode=signup">Get started — 3 months free</a>
@@ -495,9 +497,10 @@ Wreath</textarea></div>
           <div class="calc-scale"><span>3</span><span>5 · standard</span><span>25</span></div>
           <div class="calc-stack" id="calc-stack" aria-hidden="true"></div>
           <div class="calc-total">
-            <div><b id="calc-m">$25</b><span>per month</span></div>
-            <div class="free"><b id="calc-s">$75</b><span>saved in your 3 free months</span></div>
+            <div><b id="calc-m">$35</b><span>per month</span></div>
+            <div class="free"><b id="calc-s">$105</b><span>saved in your 3 free months</span></div>
           </div>
+          <p class="calc-dep">Plus a <b id="calc-d">$100</b> refundable bin deposit, returned when you cancel.</p>
         </div>
       </div>
       <div class="addons">
@@ -584,6 +587,7 @@ Wreath</textarea></div>
         <details><summary>Does anyone else's stuff go in my bin?</summary><p>Never. Your bins are sealed, serial-numbered and only ever opened by you.</p></details>
         <details><summary>How do deliveries work?</summary><p>Every account gets 10 free deliveries a year — one delivery can bring back as many bins as you like. After 10, it's $9.99 a trip. Sending bins back to storage is always free.</p></details>
         <details><summary>How many bins do I need?</summary><p>Most homes start with 5 — about 510 litres (18 cubic feet) of seasonal stuff. The minimum is 3, and you can add more any time from your dashboard.</p></details>
+        <details><summary>Is there a deposit?</summary><p>Yes — $20 per bin, taken when we drop off your bins ($100 for the standard 5). It comes back when you cancel and your bins are returned in good shape.</p></details>
         <details><summary>What's the founding-member offer?</summary><p>Sign up during launch and your first three months of storage are free. We'll ask for a card when we drop off your bins; billing starts after the free months, and you can cancel before then.</p></details>
         <details><summary>Can I cancel?</summary><p>Any time. We'll deliver your bins back and stop billing at the end of the month.</p></details>
       </div>
@@ -601,6 +605,6 @@ Wreath</textarea></div>
   </div>
 </footer>
 
-<script type="module" src="assets/js/site.js?v=5"></script>
+<script type="module" src="assets/js/site.js?v=6"></script>
 </body>
 </html>

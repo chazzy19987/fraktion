@@ -1,6 +1,6 @@
 // Marketing site interactions.
-import { icon, esc, toast, dateStrip, windowChoices, serviceDays, EMOJIS } from './ui.js?v=5';
-import { PRICING, joinWaitlist, init } from './api.js?v=5';
+import { icon, esc, toast, dateStrip, windowChoices, serviceDays, EMOJIS } from './ui.js?v=6';
+import { PRICING, joinWaitlist, init } from './api.js?v=6';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -28,6 +28,7 @@ const renderCalc = () => {
   $('#calc-l').textContent = (n * 102).toLocaleString('en-CA');
   $('#calc-m').textContent = `$${monthly}`;
   $('#calc-s').textContent = `$${monthly * PRICING.founderFreeMonths}`;
+  $('#calc-d').textContent = `$${n * PRICING.depositCents / 100}`;
   $('#calc-stack').innerHTML = Array.from({ length: n }, (_, i) => `<i class="${i < PRICING.standardBins ? 'std' : ''}"></i>`).join('');
 };
 range.addEventListener('input', renderCalc);

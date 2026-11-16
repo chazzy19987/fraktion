@@ -48,7 +48,7 @@ const fail = (error) => { if (error) throw new Error(error.message || String(err
 /* =====================================================================
    DEMO STORE — mirrors the database rules in supabase/schema.sql
    ===================================================================== */
-const DEMO_KEY = 'fraktion-demo-v2';
+const DEMO_KEY = 'fraktion-demo-v3';
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
 const nowIso = () => new Date().toISOString();
 const daysFromNow = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d; };
@@ -82,12 +82,12 @@ function seed() {
     req(me, 'pickup', [], 0, 0, 'afternoon', 'completed', 12, { bin_ids: [bins[3].id], scheduled_date: isoDate(daysFromNow(-11)), address: '1234 Glen Abbey Gate, Oakville, L6M 2V4' }),
   ];
   const items = [
-    { id: 'item-table', slug: 'folding-table-6ft', name: '6 ft grey folding table', description: 'Seats 6–8. Sturdy, wipe-clean top. Great for birthdays, garage sales and holiday overflow.', emoji: '🪑', price_cents_per_day: 1500, quantity_total: 6, max_per_booking: 6, active: true, sort: 1 },
+    { id: 'item-table', slug: 'folding-table-6ft', name: '6 ft grey folding table', description: 'Seats 6–8. Sturdy, wipe-clean top. Great for birthdays, garage sales and holiday overflow.', emoji: '🪑', price_cents_per_day: 2500, quantity_total: 6, max_per_booking: 6, active: true, sort: 1 },
     { id: 'item-chair', slug: 'folding-chair', name: 'Folding chair', description: 'Matching grey folding chairs. Pairs with the 6 ft table.', emoji: '💺', price_cents_per_day: 300, quantity_total: 0, max_per_booking: 40, active: false, sort: 2 },
     { id: 'item-castle', slug: 'bounce-castle', name: 'Bounce castle', description: 'Delivered, set up and taken down by our crew.', emoji: '🏰', price_cents_per_day: 6500, quantity_total: 0, max_per_booking: 1, active: false, sort: 3 },
   ];
   const bookings = [
-    { id: uid(), customer_id: 'cust-2', item_id: 'item-table', quantity: 2, start_date: isoDate(sd[3]), end_date: isoDate(sd[4]), time_window: 'morning', address: '214 Lakeshore Rd E, Oakville, L6J 1H8', notes: 'Birthday party', total_cents: 6000, status: 'scheduled', paid: true, created_at: daysFromNow(-2).toISOString() },
+    { id: uid(), customer_id: 'cust-2', item_id: 'item-table', quantity: 2, start_date: isoDate(sd[3]), end_date: isoDate(sd[4]), time_window: 'morning', address: '214 Lakeshore Rd E, Oakville, L6J 1H8', notes: 'Birthday party', total_cents: 10000, status: 'scheduled', paid: true, created_at: daysFromNow(-2).toISOString() },
   ];
   const profiles = {
     [me]: { id: me, email: 'alex@example.com', full_name: 'Alex Morgan', phone: '905-555-0142', address_line1: '1234 Glen Abbey Gate', address_line2: '', city: 'Oakville', postal_code: 'L6M 2V4', access_notes: 'Garage code 4412', plan: 'family', delivery_credits: 8, subscription_status: 'active', is_admin: true, created_at: daysFromNow(-60).toISOString() },

@@ -70,7 +70,7 @@ p { margin: 0; }
 
 /* Display type — Archivo stretched wide reads like warehouse signage */
 .display {
-  font-stretch: 125%;
+  font-stretch: 108%;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.015em;
@@ -89,7 +89,7 @@ p { margin: 0; }
 /* ---------- Logo ---------- */
 .logo {
   display: inline-flex; align-items: center; gap: 10px;
-  text-decoration: none; font-weight: 800; font-stretch: 125%;
+  text-decoration: none; font-weight: 800; font-stretch: 108%;
   font-size: 20px; letter-spacing: .02em; text-transform: uppercase;
 }
 .logo-mark {
@@ -241,7 +241,7 @@ p { margin: 0; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm); }
 .card-pad { padding: 20px; }
 .stat { padding: 16px 18px; }
-.stat-num { font-size: 30px; font-weight: 800; font-stretch: 115%; line-height: 1.1; }
+.stat-num { font-size: 30px; font-weight: 800; font-stretch: 104%; line-height: 1.1; }
 .stat-label { font-size: 13px; color: var(--muted); }
 
 /* Request tracker */
@@ -271,7 +271,7 @@ p { margin: 0; }
   animation: rise .22s var(--ease);
 }
 .modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 22px 22px 0; }
-.modal-head h2 { font-size: 22px; font-weight: 800; font-stretch: 112%; }
+.modal-head h2 { font-size: 22px; font-weight: 800; font-stretch: 104%; }
 .modal-head p { color: var(--muted); font-size: 14px; margin-top: 4px; }
 .modal-body { padding: 18px 22px; }
 .modal-foot { display: flex; gap: 10px; justify-content: flex-end; padding: 0 22px 22px; flex-wrap: wrap; }
@@ -344,7 +344,7 @@ p { margin: 0; }
 .nav .count { margin-left: auto; font-family: var(--mono); font-size: 12px; background: var(--yellow); color: var(--ink); border-radius: 999px; padding: 0 7px; font-weight: 600; }
 .plan-card { margin-top: auto; padding: 16px; border-radius: var(--r-lg); background: var(--ink-2); border: 1px solid var(--ink-line); }
 .plan-card .eyebrow { color: var(--muted-light); }
-.plan-card h4 { font-size: 17px; margin: 6px 0 10px; font-stretch: 112%; }
+.plan-card h4 { font-size: 17px; margin: 6px 0 10px; font-stretch: 104%; }
 .meter { height: 6px; border-radius: 99px; background: var(--ink-line); overflow: hidden; }
 .meter > i { display: block; height: 100%; background: var(--yellow); border-radius: inherit; }
 .plan-card small { display: block; margin-top: 8px; color: var(--muted-light); font-size: 12px; }
@@ -356,7 +356,7 @@ p { margin: 0; }
   padding: 14px 32px; background: rgba(245, 242, 234, .88); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
-.topbar h1 { font-size: 22px; font-weight: 800; font-stretch: 112%; }
+.topbar h1 { font-size: 22px; font-weight: 800; font-stretch: 104%; }
 .topbar .sub { font-size: 14px; color: var(--muted); }
 .topbar-actions { display: flex; gap: 10px; align-items: center; }
 .content { padding: 28px 32px 64px; max-width: 1240px; }
@@ -409,7 +409,7 @@ table.table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .rental-art .pill { position: absolute; top: 12px; left: 12px; }
 .rental-body { padding: 16px; display: grid; gap: 8px; flex: 1; align-content: start; }
 .rental-body h3 { font-size: 17px; }
-.rental-price { font-weight: 800; font-size: 20px; font-stretch: 112%; }
+.rental-price { font-weight: 800; font-size: 20px; font-stretch: 104%; }
 .rental-price small { font-size: 13px; font-weight: 500; color: var(--muted); font-stretch: 100%; }
 
 /* Mobile bottom nav for the app */

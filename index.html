@@ -15,7 +15,7 @@
   <style>
     .wrap { width: min(1200px, 100% - 40px); margin-inline: auto; }
     section { padding: 110px 0; }
-    .h2 { font-size: clamp(36px, 5.2vw, 64px); }
+    .h2 { font-size: clamp(34px, 4.6vw, 60px); overflow-wrap: break-word; }
     .lede { font-size: 19px; color: var(--muted); max-width: 560px; }
     .on-dark { background: var(--ink); color: #fff; }
     .on-dark .lede, .on-dark .eyebrow { color: #B3AFA3; }
@@ -39,10 +39,10 @@
       background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
       background-size: 56px 56px; mask-image: radial-gradient(ellipse at 70% 40%, #000 30%, transparent 75%);
     }
-    .hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: 56px; align-items: center; }
+    .hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 56px; align-items: center; }
     .hero-badge { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 8px; border: 1px solid var(--ink-line); border-radius: 999px; font-size: 13px; color: #CFCBBF; margin-bottom: 28px; }
     .hero-badge .pill { font-size: 11px; }
-    .hero h1 { font-size: clamp(48px, 7vw, 92px); }
+    .hero h1 { font-size: clamp(44px, 5.4vw, 80px); overflow-wrap: break-word; }
     .hero h1 em { font-style: normal; color: var(--yellow); }
     .hero .lede { margin: 26px 0 34px; font-size: 20px; }
     .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -63,11 +63,11 @@
     .frame-side i.on { background: var(--yellow); }
     .frame-main { padding: 16px 18px; min-width: 0; }
     .frame-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; }
-    .frame-top b { font-size: 16px; font-stretch: 112%; }
+    .frame-top b { font-size: 16px; font-stretch: 104%; }
     .frame-top .btn { min-height: 30px; font-size: 12px; padding: 0 10px; border-radius: 7px; }
     .frame-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
     .frame-stats div { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
-    .frame-stats b { display: block; font-size: 18px; font-stretch: 112%; }
+    .frame-stats b { display: block; font-size: 18px; font-stretch: 104%; }
     .frame-stats small { font-size: 11px; color: var(--muted); }
     .frame-bins { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .mini-bin { background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; transition: box-shadow .3s, border-color .3s; }
@@ -95,7 +95,7 @@
     /* Marquee */
     .ticker { background: var(--yellow); overflow: hidden; white-space: nowrap; border-block: 1px solid var(--ink); }
     .ticker-inner { display: inline-flex; animation: tick 34s linear infinite; }
-    .ticker span { font-weight: 800; font-stretch: 125%; text-transform: uppercase; font-size: 17px; padding: 14px 26px; display: inline-flex; align-items: center; gap: 26px; }
+    .ticker span { font-weight: 800; font-stretch: 108%; text-transform: uppercase; font-size: 17px; padding: 14px 26px; display: inline-flex; align-items: center; gap: 26px; }
     .ticker span::after { content: '■'; font-size: 9px; }
     @keyframes tick { to { transform: translateX(-50%); } }
 
@@ -105,7 +105,7 @@
     .step-num { font-family: var(--mono); font-size: 13px; color: var(--muted); }
     .step-icon { width: 54px; height: 54px; border-radius: 14px; background: var(--ink); color: var(--yellow); display: grid; place-items: center; margin: 18px 0 18px; }
     .step-icon svg { width: 26px; height: 26px; }
-    .step h3 { font-size: 20px; font-stretch: 112%; margin-bottom: 8px; }
+    .step h3 { font-size: 20px; font-stretch: 104%; margin-bottom: 8px; }
     .step p { color: var(--muted); font-size: 15px; }
     .step:not(:last-child)::after {
       content: ''; position: absolute; top: 58px; right: -19px; width: 20px; height: 2px;
@@ -131,7 +131,7 @@
     .show-panel h4 { font-size: 13px; font-family: var(--mono); color: var(--muted); font-weight: 500; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 14px; }
     .split2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
     .price-calc { margin-top: 18px; padding: 16px; border-radius: var(--r); background: var(--ink); color: #fff; display: flex; justify-content: space-between; align-items: center; }
-    .price-calc b { font-size: 28px; font-stretch: 115%; color: var(--yellow); }
+    .price-calc b { font-size: 28px; font-stretch: 104%; color: var(--yellow); }
 
     /* Compare */
     .compare { margin-top: 48px; border: 1px solid var(--line); border-radius: var(--r-xl); overflow: hidden; background: var(--card); }
@@ -152,7 +152,7 @@
     .plan .pill-yellow { position: absolute; top: -12px; left: 26px; }
     .plan h3 { font-size: 15px; font-family: var(--mono); font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
     .plan.featured h3 { color: #B3AFA3; }
-    .plan-price { font-size: 64px; font-weight: 800; font-stretch: 125%; line-height: 1; margin: 18px 0 4px; }
+    .plan-price { font-size: 64px; font-weight: 800; font-stretch: 108%; line-height: 1; margin: 18px 0 4px; }
     .plan-unit { color: var(--muted); font-size: 15px; }
     .plan.featured .plan-unit { color: #B3AFA3; }
     .plan-blurb { margin: 18px 0; font-size: 15px; }
@@ -170,9 +170,9 @@
     /* Rentals */
     .rent-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-top: 52px; }
     .rent-hero { position: relative; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 20px; padding: 34px; border-radius: var(--r-xl); background: var(--yellow); overflow: hidden; }
-    .rent-hero h3 { font-size: 34px; font-stretch: 125%; text-transform: uppercase; font-weight: 800; line-height: .95; }
+    .rent-hero h3 { font-size: 34px; font-stretch: 108%; text-transform: uppercase; font-weight: 800; line-height: .95; }
     .rent-hero p { margin: 14px 0 22px; font-size: 15px; }
-    .rent-hero .price { font-size: 44px; font-weight: 800; font-stretch: 125%; line-height: 1; }
+    .rent-hero .price { font-size: 44px; font-weight: 800; font-stretch: 108%; line-height: 1; }
     .rent-hero .price small { font-size: 15px; font-stretch: 100%; font-weight: 600; }
     .table-art { width: 100%; height: auto; }
     .rent-side { display: grid; gap: 18px; }
@@ -489,7 +489,7 @@ Wreath</textarea></div>
             <span class="pill" style="background:var(--ink);color:var(--yellow)">Available now</span>
             <h3 style="margin-top:16px">6 ft grey<br>folding tables</h3>
             <p>Seats 6–8. Birthdays, garage sales, the overflow table at Christmas dinner.</p>
-            <div class="price">$15<small> / day per table</small></div>
+            <div class="price">$25<small> / day per table</small></div>
             <a href="auth.html?mode=signup&next=rentals" class="btn btn-dark" style="margin-top:20px">Book tables</a>
           </div>
           <svg class="table-art" viewBox="0 0 320 220" aria-hidden="true">

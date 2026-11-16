@@ -389,7 +389,7 @@ grant execute on function public.rental_available(uuid, date, date) to anon, aut
 -- Starter rental catalogue — edit prices and quantities any time
 -- =====================================================================
 insert into public.rental_items (slug, name, description, emoji, price_cents_per_day, quantity_total, max_per_booking, active, sort) values
-  ('folding-table-6ft', '6 ft grey folding table', 'Seats 6–8. Sturdy, wipe-clean top. Great for birthdays, garage sales and holiday overflow.', '🪑', 1500, 6, 6, true, 1),
+  ('folding-table-6ft', '6 ft grey folding table', 'Seats 6–8. Sturdy, wipe-clean top. Great for birthdays, garage sales and holiday overflow.', '🪑', 2500, 6, 6, true, 1),
   ('folding-chair', 'Folding chair', 'Matching grey folding chairs. Pairs with the 6 ft table.', '💺', 300, 0, 40, false, 2),
   ('bounce-castle', 'Bounce castle', 'Delivered, set up and taken down by our crew.', '🏰', 6500, 0, 1, false, 3)
 on conflict (slug) do nothing;
@@ -398,3 +398,6 @@ on conflict (slug) do nothing;
 -- Make yourself staff: sign up on the site first, then run
 --   update public.profiles set is_admin = true where email = 'you@example.com';
 -- =====================================================================
+
+-- Price update (Nov 2026): tables are $25/day. Safe to re-run.
+update public.rental_items set price_cents_per_day = 2500 where slug = 'folding-table-6ft' and price_cents_per_day = 1500;

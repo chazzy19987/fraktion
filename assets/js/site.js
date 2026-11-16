@@ -1,6 +1,6 @@
 // Marketing site interactions.
-import { icon, esc, toast, dateStrip, windowChoices, serviceDays, EMOJIS } from './ui.js';
-import { PLANS, joinWaitlist, init } from './api.js';
+import { icon, esc, toast, dateStrip, windowChoices, serviceDays, EMOJIS } from './ui.js?v=4';
+import { PLANS, joinWaitlist, init } from './api.js?v=4';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];

@@ -4,7 +4,7 @@
 //   • demo — everything stored in this browser, so the site works before any keys are added
 // Every page talks to this file only, so swapping or extending the backend happens here.
 
-import { isoDate, serviceDays } from './ui.js';
+import { isoDate, serviceDays } from './ui.js?v=4';
 
 export const PLANS = {
   starter: { name: 'Starter', price: 5, priceLabel: '$5', unit: 'per bin / month', bins: null, credits: 4, blurb: 'Pay per bin. Perfect for seasonal stuff.' },

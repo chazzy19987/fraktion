@@ -2,8 +2,8 @@
 import {
   icon, esc, money, fmtDate, fmtRelative, isoDate, serviceDays, toast, modal, confirmModal, setBusy,
   dateStrip, windowChoices, WINDOWS, BIN_STATUS, REQ_STATUS, REQ_TYPE, EMOJIS,
-} from './ui.js';
-import * as api from './api.js';
+} from './ui.js?v=4';
+import * as api from './api.js?v=4';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];

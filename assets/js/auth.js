@@ -1,5 +1,5 @@
-import { icon, esc, setBusy } from './ui.js';
-import { init, getUser, signIn, signUp, sendPasswordReset, updatePassword, PLANS, getMode } from './api.js';
+import { icon, esc, setBusy } from './ui.js?v=4';
+import { init, getUser, signIn, signUp, sendPasswordReset, updatePassword, PLANS, getMode } from './api.js?v=4';
 
 const $ = (s) => document.querySelector(s);
 document.querySelectorAll('[data-icon]').forEach((el) => { el.innerHTML = icon[el.dataset.icon] || ''; });

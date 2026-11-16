@@ -1,6 +1,6 @@
 // Ops board: the daily run sheet, customers, bins, rentals and waitlist.
-import { icon, esc, money, fmtDate, fmtRelative, isoDate, toast, confirmModal, setBusy, WINDOWS, BIN_STATUS, REQ_STATUS, REQ_TYPE } from './ui.js';
-import * as api from './api.js';
+import { icon, esc, money, fmtDate, fmtRelative, isoDate, toast, confirmModal, setBusy, WINDOWS, BIN_STATUS, REQ_STATUS, REQ_TYPE } from './ui.js?v=4';
+import * as api from './api.js?v=4';
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
